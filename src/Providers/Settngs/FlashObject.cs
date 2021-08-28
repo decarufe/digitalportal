@@ -17,7 +17,7 @@ namespace Bytewizer.TinyCLR.DigitalPortal
             Lat = "39.03";
             Lon = "-77.5";
             Query = null;
-            Units = Units.Imperial;
+            Units = Units.Metric;
             TimeServer = "pool.ntp.org";
             TimeOffset = -5;
             Location = "Ashburn, VA";

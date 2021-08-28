@@ -25,7 +25,7 @@ namespace Bytewizer.TinyCLR.DigitalPortal
             Controller = new SecureStorageController(SecureStorage.Configuration);
 
             Flash = ReadFlash();
-
+            Flash.Units = Units.Metric;
             Theme = new ThemeObject();
             Theme.SetThemeColor(Flash.ThemeColor);
 

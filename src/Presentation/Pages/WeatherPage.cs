@@ -97,7 +97,7 @@ namespace Bytewizer.TinyCLR.DigitalPortal
 
             textDate = new DigitalText
             {
-                Text = DateTime.Now.ToString("ddd, MMM dd hh:mm tt"),
+                Text = DateTime.Now.ToString("ddd, MMM dd HH:mm"),
                 TextAlign = TextAlignment.Right
             };
             textDate.SetMargin(5);
@@ -118,6 +118,7 @@ namespace Bytewizer.TinyCLR.DigitalPortal
             {
                 Text = WeatherProvider.Weather.Temp,
                 Font = ResourcesProvider.MediumDigitalFont,
+                Width = 90,
                 Foreground = new SolidColorBrush(SettingsProvider.Theme.Highlighted)
             };
 
@@ -125,6 +126,7 @@ namespace Bytewizer.TinyCLR.DigitalPortal
             {
                 Text = WeatherProvider.Weather.High,
                 Foreground = new SolidColorBrush(SettingsProvider.Theme.Highlighted),
+                Width = 40,
                 VerticalAlignment = VerticalAlignment.Center
 
             };
@@ -140,6 +142,7 @@ namespace Bytewizer.TinyCLR.DigitalPortal
             {
                 Text = WeatherProvider.Weather.Low,
                 Foreground = new SolidColorBrush(SettingsProvider.Theme.Highlighted),
+                Width = 40,
                 VerticalAlignment = VerticalAlignment.Center
             };
             textLow.SetMargin(0, 2, 0, 0);
@@ -298,7 +301,7 @@ namespace Bytewizer.TinyCLR.DigitalPortal
             var dateTime = ClockProvider.Controller.Now;
             UXExtensions.DoThreadSafeAction(textDate, () =>
             {
-                textDate.Text = dateTime.ToString("ddd, MMM dd hh:mm tt");
+                textDate.Text = dateTime.ToString("ddd, MMM dd HH:mm");
                 textDate.Invalidate();
             });
 

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Net;
 using System.Threading;
 
 using GHIElectronics.TinyCLR.UI;
@@ -86,6 +88,8 @@ namespace Bytewizer.TinyCLR.DigitalPortal
             mainWindow.Activate(SettingsProvider.Flash.DefaultPage);
 
             MainProgram.Run(mainWindow);
+
+            Timer keepAlive = new Timer(KeepAlive, null, TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(20)); // 20 seconds
         }
 
         private static void TimerTick(object sender)
@@ -98,6 +102,61 @@ namespace Bytewizer.TinyCLR.DigitalPortal
                 {
                     NetworkProvider.ConnectNetworkTime();
                     timerTick = 0;
+                }
+            }
+        }
+
+        private static void KeepAlive(object sender)
+        {
+            if (NetworkProvider.IsConnected)
+            {
+                var url = "http://www.bing.com/robots.txt";
+
+                int read = 0, total = 0;
+                byte[] result = new byte[512];
+
+                try
+                {
+                    using (var req = WebRequest.Create(url) as HttpWebRequest)
+                    {
+                        req.KeepAlive = false;
+                        req.ReadWriteTimeout = 2000;
+
+                        using (var res = req.GetResponse() as HttpWebResponse)
+                        {
+                            using (var stream = res.GetResponseStream())
+                            {
+                                do
+                                {
+                                    read = stream.Read(result, 0, result.Length);
+                                    total += read;
+
+                                    Debug.WriteLine("read : " + read);
+                                    Debug.WriteLine("total : " + total);
+
+                                    String page = "";
+
+                                    page = new String(System.Text.Encoding.UTF8.GetChars
+                                        (result, 0, read));
+
+                                    Debug.WriteLine("Response : " + page);
+                                }
+
+                                while (read != 0);
+                            }
+                        }
+                    }
+                }
+                catch(Exception e)
+                {
+                    Debug.WriteLine(e.ToString());
+                }
+
+                if (total == 0)
+                {
+                    NetworkProvider.DisableWifi();
+                    Thread.Sleep(1000);
+                    NetworkProvider.EnableWifi();
                 }
             }
         }

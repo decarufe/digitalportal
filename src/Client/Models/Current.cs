@@ -2,7 +2,7 @@
 {
 
 #pragma warning disable IDE1006 // Naming Styles
-    
+
     public class Current
     {
         public int dt { get; set; }

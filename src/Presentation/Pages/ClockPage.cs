@@ -33,6 +33,8 @@ namespace Bytewizer.TinyCLR.DigitalPortal
 
             clockTimer = new DispatcherTimer();
             statusTimer = new DispatcherTimer();
+            
+            InitializePage();
 
             clockTimer.Tick += ClockTimer_Tick;
             clockTimer.Interval = new TimeSpan(0, 0, 1);
@@ -41,8 +43,6 @@ namespace Bytewizer.TinyCLR.DigitalPortal
             statusTimer.Tick += StatusTimer_Tick;
             statusTimer.Interval = new TimeSpan(0, 0, 1);
             statusTimer.Start();
-
-            InitializePage();
         }
         
         public override void OnActivate() { }
@@ -82,7 +82,7 @@ namespace Bytewizer.TinyCLR.DigitalPortal
             {
                 Text = ResourcesProvider.UxNotificationOff,
                 Font = ResourcesProvider.SmallUxIcons,
-                Width = 20
+                Width = 30
             };
             textAlarmIcon.SetMargin(5);
 
@@ -118,6 +118,7 @@ namespace Bytewizer.TinyCLR.DigitalPortal
             {
                 Text = "00:00",
                 Font = ResourcesProvider.LargeDigitalFont,
+                Width = 300,
                 Foreground = new SolidColorBrush(SettingsProvider.Theme.Highlighted)
             };
 
@@ -125,6 +126,7 @@ namespace Bytewizer.TinyCLR.DigitalPortal
             {
                 Text = "AM",
                 Foreground = new SolidColorBrush(SettingsProvider.Theme.Highlighted),
+                Width = 50,
                 HorizontalAlignment = HorizontalAlignment.Right
             };
 
@@ -132,6 +134,7 @@ namespace Bytewizer.TinyCLR.DigitalPortal
             {
                 Text = ":",
                 Font = ResourcesProvider.MediumDigitalFont,
+                Width = 40,
                 Foreground = new SolidColorBrush(SettingsProvider.Theme.Highlighted)
             };
 
@@ -139,6 +142,7 @@ namespace Bytewizer.TinyCLR.DigitalPortal
             {
                 Text = "00",
                 Font = ResourcesProvider.MediumDigitalFont,
+                Width = 80,
                 Foreground = new SolidColorBrush(SettingsProvider.Theme.Highlighted)
             };
 
@@ -150,6 +154,7 @@ namespace Bytewizer.TinyCLR.DigitalPortal
                 textDays[i] = new DigitalText
                 {
                     Text = daysofweek[i],
+                    Width = 40, 
                     Foreground = new SolidColorBrush(SettingsProvider.Theme.Shadow)
                 };
                 textDays[i].SetMargin(12);
@@ -235,6 +240,16 @@ namespace Bytewizer.TinyCLR.DigitalPortal
 
                 }
             }
+            else
+            {
+                if (statusTick == 3)
+                {
+                    if (SettingsProvider.Flash.NetworkEnabled)
+                    {
+                        NetworkProvider.EnableWifi();
+                    }
+                }
+            }
 
             if (statusTick == 17)
             {
@@ -248,13 +263,13 @@ namespace Bytewizer.TinyCLR.DigitalPortal
 
             UXExtensions.DoThreadSafeAction(textTime, () =>
             {
-                textTime.Text = dateTime.ToString("hh:mm"); ;
+                textTime.Text = dateTime.ToString("HH:mm"); ;
                 textTime.Invalidate();
             });
 
             UXExtensions.DoThreadSafeAction(textMeridiem, () =>
             {
-                textMeridiem.Text = dateTime.ToString("tt"); ;
+                textMeridiem.Text = "  "; // dateTime.ToString("tt"); ;
                 textMeridiem.Invalidate();
             });
 

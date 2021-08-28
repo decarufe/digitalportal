@@ -62,38 +62,30 @@ namespace Bytewizer.TinyCLR.DigitalPortal.Client
             return null;
         }
 
-        private static object CreateInstance(string path, JToken root, Type baseType, string name, int length)
+        private static object CreateInstance(
+            string path, 
+            JToken root, 
+            Type baseType, 
+            string name, 
+            int length)
         {
             if (path == "/current" & name == null)
                 return new Current();
 
-            //if (path == "/" & name == null)
-            //{
-            //    var tom = root.GetType();
-            //    var tom2 = root.GetBsonType();
-            //    var tom3 = root.GetBsonSize();
-            //    var tom4 = root.ToString();
-            //    return new Daily[100];
-            //}
+            if (path == "//daily" & name == null)
+                return new Daily();
 
+            if (path == "//daily" & name == "weather")
+                return new Weather[length];
 
-            //if (path == "/" & name == "daily")
-            //    return new Daily[length];
+            if (path == "//daily/weather" & name == null)
+                return new Weather();
 
-            //if (path == "//daily" & name == null)
-            //    return new Daily();
+            if (path == "/current" & name == "weather")
+                return new Weather[length];
 
-            //if (path == "//daily" & name == "weather")
-            //    return new Weather[length];
-
-            //if (path == "//daily/weather" & name == null)
-            //    return new Weather();
-
-            //if (path == "/current" & name == "weather")
-            //    return new Weather[length];
-
-            //if (path == "/current/weather" & name == null)
-            //    return new Weather();
+            if (path == "/current/weather" & name == null)
+                return new Weather();
 
             return null;
         }
