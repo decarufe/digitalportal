@@ -15,6 +15,7 @@ namespace Bytewizer.TinyCLR.DigitalPortal
     public class WatchdogService : IDisposable
     {
         private readonly ILogger _logger;
+        private readonly WatchdogOptions _options;
         private readonly Timer _watchdogTimer;
         private readonly Timer _healthCheckTimer;
         private readonly Hashtable _serviceHeartbeats;
@@ -24,25 +25,22 @@ namespace Bytewizer.TinyCLR.DigitalPortal
         private bool _isDisposed = false;
         private DateTime _lastSystemCheck;
         private int _consecutiveFailures = 0;
-        
-        // Configuration
-        private readonly TimeSpan _watchdogInterval = TimeSpan.FromSeconds(30);
-        private readonly TimeSpan _healthCheckInterval = TimeSpan.FromMinutes(2);
-        private readonly TimeSpan _maxServiceTimeout = TimeSpan.FromMinutes(5);
-        private readonly int _maxConsecutiveFailures = 3;
 
-        public WatchdogService(ILoggerFactory loggerFactory)
+        public WatchdogService(ILoggerFactory loggerFactory, WatchdogOptions options = null)
         {
             _logger = loggerFactory.CreateLogger(nameof(WatchdogService));
+            _options = options ?? WatchdogOptions.CreateDefault();
+            _options.Validate();
+            
             _serviceHeartbeats = new Hashtable();
             _healthCheckServices = new Hashtable();
             _lastSystemCheck = DateTime.Now;
             
-            // Initialize timers
-            _watchdogTimer = new Timer(WatchdogCheck, null, _watchdogInterval, _watchdogInterval);
-            _healthCheckTimer = new Timer(HealthCheck, null, _healthCheckInterval, _healthCheckInterval);
+            // Initialize timers with configured intervals
+            _watchdogTimer = new Timer(WatchdogCheck, null, _options.WatchdogInterval, _options.WatchdogInterval);
+            _healthCheckTimer = new Timer(HealthCheck, null, _options.HealthCheckInterval, _options.HealthCheckInterval);
             
-            _logger.LogInformation("Watchdog service started with {0}s interval", _watchdogInterval.TotalSeconds);
+            _logger.LogInformation("Watchdog service started with {0}s interval", _options.WatchdogInterval.TotalSeconds);
         }
 
         /// <summary>
@@ -100,11 +98,16 @@ namespace Bytewizer.TinyCLR.DigitalPortal
                         var lastHeartbeat = (DateTime)entry.Value;
                         var timeSinceHeartbeat = currentTime - lastHeartbeat;
 
-                        if (timeSinceHeartbeat > _maxServiceTimeout)
+                        if (timeSinceHeartbeat > _options.MaxServiceTimeout)
                         {
                             _logger.LogWarning("Service {0} timeout detected: {1} minutes since last heartbeat", 
                                 serviceName, timeSinceHeartbeat.TotalMinutes);
                             systemHealthy = false;
+                        }
+                        else if (_options.VerboseLogging)
+                        {
+                            _logger.LogTrace("Service {0} heartbeat OK: {1} seconds ago", 
+                                serviceName, timeSinceHeartbeat.TotalSeconds);
                         }
                     }
                 }
@@ -126,7 +129,7 @@ namespace Bytewizer.TinyCLR.DigitalPortal
                     _consecutiveFailures++;
                     _logger.LogError("System health check failed. Consecutive failures: {0}", _consecutiveFailures);
 
-                    if (_consecutiveFailures >= _maxConsecutiveFailures)
+                    if (_consecutiveFailures >= _options.MaxConsecutiveFailures)
                     {
                         TriggerRecovery();
                     }
@@ -208,7 +211,7 @@ namespace Bytewizer.TinyCLR.DigitalPortal
                 // Simple memory pressure check - if we can't allocate a reasonable buffer, we're in trouble
                 try
                 {
-                    var testBuffer = new byte[1024]; // 1KB test allocation
+                    var testBuffer = new byte[_options.MemoryTestSize];
                     return true;
                 }
                 catch (OutOfMemoryException)
@@ -264,11 +267,12 @@ namespace Bytewizer.TinyCLR.DigitalPortal
                 Thread.Sleep(5000); // Give system time to recover
                 _consecutiveFailures = 0;
                 
-                // In a production system, you might want to:
-                // 1. Restart specific services
-                // 2. Reset hardware components
-                // 3. Perform a system restart as last resort
-                // Power.Reset(); // Uncomment for full system reset
+                // In a production system with aggressive recovery enabled
+                if (_options.EnableSystemReset && _consecutiveFailures >= _options.MaxConsecutiveFailures)
+                {
+                    _logger.LogCritical("Performing system reset due to persistent failures");
+                    // Power.Reset(); // Uncomment for full system reset
+                }
             }
             catch (Exception ex)
             {

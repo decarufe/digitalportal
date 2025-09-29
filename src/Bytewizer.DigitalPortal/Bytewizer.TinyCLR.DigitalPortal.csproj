@@ -49,6 +49,7 @@
     <Compile Include="Services\WirelessService.cs" />
     <Compile Include="Services\WatchdogService.cs" />
     <Compile Include="Services\WatchdogWorker.cs" />
+    <Compile Include="Services\WatchdogOptions.cs" />
     <Compile Include="Services\Settngs\WeatherObject.cs" />
     <Compile Include="Services\WeatherService.cs" />
     <Compile Include="Services\WeatherWorker.cs" />
@@ -59,6 +60,7 @@
     <Compile Include="Hosting\HostingAbstractionsHostExtensions.cs" />
     <Compile Include="Hosting\LoggingServiceCollectionExtension.cs" />
     <Compile Include="Hosting\ThreadPoolServiceCollectionExtension.cs" />
+    <Compile Include="Hosting\WatchdogServiceCollectionExtensions.cs" />
     <Compile Include="Presentation\Abstractions\SettingsPage.cs" />
     <Compile Include="Presentation\Pages\Settings\AppearancePage.cs" />
     <Compile Include="Presentation\Pages\Settings\OpenWeatherPage.cs" />
