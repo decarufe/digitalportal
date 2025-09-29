@@ -47,6 +47,9 @@
     <Compile Include="Services\ClockService.cs" />
     <Compile Include="Services\DisplayWorker.cs" />
     <Compile Include="Services\WirelessService.cs" />
+    <Compile Include="Services\WatchdogService.cs" />
+    <Compile Include="Services\WatchdogWorker.cs" />
+    <Compile Include="Services\WatchdogOptions.cs" />
     <Compile Include="Services\Settngs\WeatherObject.cs" />
     <Compile Include="Services\WeatherService.cs" />
     <Compile Include="Services\WeatherWorker.cs" />
@@ -57,6 +60,7 @@
     <Compile Include="Hosting\HostingAbstractionsHostExtensions.cs" />
     <Compile Include="Hosting\LoggingServiceCollectionExtension.cs" />
     <Compile Include="Hosting\ThreadPoolServiceCollectionExtension.cs" />
+    <Compile Include="Hosting\WatchdogServiceCollectionExtensions.cs" />
     <Compile Include="Presentation\Abstractions\SettingsPage.cs" />
     <Compile Include="Presentation\Pages\Settings\AppearancePage.cs" />
     <Compile Include="Presentation\Pages\Settings\OpenWeatherPage.cs" />
@@ -72,6 +76,7 @@
     <Compile Include="Client\WeatherResponse.cs" />
     <Compile Include="Controls\DigitalText.cs" />
     <Compile Include="Extensions\UXExtensions.cs" />
+    <Compile Include="Extensions\WatchdogExtensions.cs" />
     <Compile Include="Presentation\Pages\NotAvailablePage.cs" />
     <Compile Include="Presentation\Pages\Settings\ThemePage.cs" />
     <Compile Include="Presentation\Pages\Settings\WifiPage.cs" />

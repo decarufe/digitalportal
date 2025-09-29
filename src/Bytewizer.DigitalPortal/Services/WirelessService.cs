@@ -11,7 +11,7 @@ using GHIElectronics.TinyCLR.Devices.Network;
 
 namespace Bytewizer.TinyCLR.DigitalPortal
 {
-    public class WirelessService : IDisposable
+    public class WirelessService : IDisposable, IHealthCheck
     {
         private readonly ILogger _logger;
         private readonly GpioPin _resetPin;
@@ -179,6 +179,43 @@ namespace Bytewizer.TinyCLR.DigitalPortal
             }
 
             return physicalAddress;
+        }
+
+        public HealthCheckResult CheckHealth()
+        {
+            try
+            {
+                // Check if controller is available
+                if (Controller == null)
+                {
+                    return HealthCheckResult.Unhealthy("Network controller is null");
+                }
+
+                // Check if network is enabled
+                if (!Controller.IsEnabled)
+                {
+                    return HealthCheckResult.Unhealthy("Network controller is disabled");
+                }
+
+                // Check network link status
+                if (!Controller.IsLinkConnected)
+                {
+                    return HealthCheckResult.Unhealthy("Network link is not connected");
+                }
+
+                // Check if we have a valid IP address
+                var ipProperties = Controller.GetIPProperties();
+                if (ipProperties?.Address?.GetAddressBytes()?[0] == 0)
+                {
+                    return HealthCheckResult.Unhealthy("No valid IP address assigned");
+                }
+
+                return HealthCheckResult.Healthy($"Network connected with IP: {ipProperties.Address}");
+            }
+            catch (Exception ex)
+            {
+                return HealthCheckResult.Unhealthy("Exception during network health check", ex);
+            }
         }
     }
 }

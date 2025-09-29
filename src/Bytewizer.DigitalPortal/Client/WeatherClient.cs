@@ -54,9 +54,10 @@ namespace Bytewizer.TinyCLR.DigitalPortal.Client
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-
+                // Log the error but don't rethrow to prevent crashes
+                System.Diagnostics.Debug.WriteLine($"Weather API error: {ex.Message}");
             }
 
             return null;
