@@ -47,15 +47,19 @@ namespace Bytewizer.TinyCLR.DigitalPortal
     public class TheadPoolService : IHostedService
     {
         readonly ILogger _logger;
+        private readonly WatchdogService _watchdog;
 
-        public TheadPoolService(ILoggerFactory loggerFactory)
+        public TheadPoolService(ILoggerFactory loggerFactory, WatchdogService watchdog)
         {
             _logger = loggerFactory.CreateLogger(nameof(TheadPoolService));
+            _watchdog = watchdog;
         }
 
         public void Start()
         {
+            _watchdog.RegisterService(nameof(TheadPoolService));
             ThreadPool.UnhandledThreadPoolException += ThreadUnhandledThreadPoolException;
+            _watchdog.ReportHeartbeat(nameof(TheadPoolService));
         }
 
         public void Stop()
@@ -66,6 +70,9 @@ namespace Bytewizer.TinyCLR.DigitalPortal
         private void ThreadUnhandledThreadPoolException(object state, Exception ex)
         {
             _logger.LogError(ex, "Unhandled thread pool exception.", null);
+            
+            // Report critical error to watchdog
+            _logger.LogCritical("Thread pool exception detected, system may be unstable");
         }
     }
 }

@@ -29,6 +29,10 @@ namespace Bytewizer.TinyCLR.DigitalPortal
                     services.AddLogging(LogLevel.Trace);
                     services.AddThreadPool();
 
+                    // Add watchdog service first to monitor other services
+                    services.AddSingleton(typeof(WatchdogService));
+                    services.AddHostedService(typeof(WatchdogWorker));
+
                     services.AddHostedService(typeof(WirelessWorker));
                     services.AddHostedService(typeof(WeatherWorker));
                     services.AddHostedService(typeof(DisplayWorker));
